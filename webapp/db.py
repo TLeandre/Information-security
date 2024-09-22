@@ -24,15 +24,15 @@ def convert_into_binary(file_path):
     binary = file.read()
   return binary
     
-def insert_into_database(file_path_name, file_blob): 
+def insert_into_database(file_path_name, file_blob, tag, nonce,aes_key, hmac_key): 
   try:
     conn = sqlite3.connect('tutorial.db')
     print("[INFO] : Successful connection!")
     cur = conn.cursor()
-    sql_insert_file_query = '''INSERT INTO uploads(file_name, file_blob)
-      VALUES(?, ?)'''
+    sql_insert_file_query = '''INSERT INTO uploads(file_name, file_blob, file_tag, file_nonce,aes_key, hmac_key)
+      VALUES(?, ?, ?, ?, ?, ?)'''
     cur = conn.cursor()
-    cur.execute(sql_insert_file_query, (file_path_name, file_blob, ))
+    cur.execute(sql_insert_file_query, (file_path_name, file_blob, tag, nonce,aes_key, hmac_key, ))
     conn.commit()
     print("[INFO] : The blob for ", file_path_name, " is in the database.") 
     #last_updated_entry = cur.lastrowid

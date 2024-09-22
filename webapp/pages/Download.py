@@ -5,6 +5,14 @@ from sqlite3 import Error
 import db as db
 import os
 
+from streamlit_pdf_viewer import pdf_viewer
+import io
+
+
+from Crypto.Cipher import AES
+from Crypto.Hash import HMAC, SHA256
+import sys
+
 st.set_page_config(layout='wide')
 
 with st.container():
@@ -12,7 +20,7 @@ with st.container():
 
     conn = sqlite3.connect('tutorial.db')
     cur = conn.cursor()
-    sql_fetch_blob_query = """SELECT id,file_name,file_blob from uploads"""
+    sql_fetch_blob_query = """SELECT id,file_name,file_blob,file_tag, file_nonce, aes_key, hmac_key from uploads"""
     cur.execute(sql_fetch_blob_query)
 
 
@@ -34,9 +42,22 @@ with st.container():
     # st.write(index)
 
     bytes = df[2].get(index)
+    tag = df[3].get(index)
+    nonce = df[4].get(index)
+    aes_key = df[5].get(index)
+    hmac_key = df[6].get(index)
+    try:
+        hmac = HMAC.new(hmac_key, digestmod=SHA256)
+        tag = hmac.update(nonce + bytes).verify(tag)
+    except ValueError:
+        st.write("The message was modified!")
+        sys.exit(1)
 
-    from streamlit_pdf_viewer import pdf_viewer
-    import io
+    cipher = AES.new(aes_key, AES.MODE_CTR, nonce=nonce)
+    message = cipher.decrypt(bytes)
+    
+    bytes = message
+    
 
     with col2:
         st.download_button("Download the file",bytes,selected_item, use_container_width = 1)
