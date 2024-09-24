@@ -12,3 +12,4 @@ TODO
 - Crypter les clées
 - Gérer les unicité des noms des fichiers entre utilisateurs
 - Alerte upload
+- Faire de la doc
