@@ -1,6 +1,68 @@
-import os
 import sqlite3
 from sqlite3 import Error
+
+def connect(email, password):
+  try:
+    con = sqlite3.connect('database.db', check_same_thread=False)
+    cursor = con.cursor()
+    cursor.execute("""SELECT PASSWORD, 
+                        ID_USER FROM USERS 
+                        WHERE EMAIL = '%s' """ % (str(email)) )
+    pw = cursor.fetchall()
+    if (pw[0][0] == password):
+      return pw[0][1]
+    else:
+      return -1
+  except:
+    return -1
+  finally:
+    if con:
+      con.close()
+    else:
+      error = "Oh shucks, something is wrong here."
+    
+def sign_in(name, surname, email, password):
+    con = sqlite3.connect('database.db', check_same_thread=False)
+    cursor = con.cursor()
+    cursor.execute("""SELECT EMAIL FROM USERS WHERE EMAIL = '%s' """ % (str(email)))
+    mail = cursor.fetchall()
+
+    if len(mail) <= 0:
+
+        pw = password
+        cursor.execute("""INSERT INTO USERS(NAME, SURNAME, EMAIL, PASSWORD) 
+                        VALUES ('%s','%s','%s','%s')""" % (name, surname, email, pw))
+        con.commit()
+        return 0
+    else :
+        return -1 
+    
+def insert_into_database(id, file_path_name, file_blob, tag, nonce,aes_key, hmac_key): 
+  try:
+    con = sqlite3.connect('database.db')
+    cur = con.cursor()
+    sql = '''INSERT INTO FILES(ID_USER, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_NONCE, AES_KEY, HMAC_KEY)
+             VALUES(?, ?, ?, ?, ?, ?, ?)'''
+    cur.execute(sql, (id, file_path_name, file_blob, tag, nonce,aes_key, hmac_key))
+    con.commit()
+  except Error as e:
+    print(e)  
+  finally: 
+    if con:
+      con.close()
+    else:
+      error = "Oh shucks, something is wrong here."
+
+def get_files(id):
+  con = sqlite3.connect('database.db')
+  cur = con.cursor()
+  sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_NONCE, AES_KEY, HMAC_KEY 
+           FROM FILES
+           WHERE ID_USER = ?"""
+  cur.execute(sql, (id,))
+  files = cur.fetchall()
+  return files
+
 
 # con = sqlite3.connect("tutorial.db")
 # cur = con.cursor()
@@ -8,11 +70,12 @@ from sqlite3 import Error
 # cur.execute("""CREATE TABLE IF NOT EXISTS uploads (
 #   id integer PRIMARY KEY,
 #   file_name text NOT NULL,
-#   file_blob text NOT NULL
+#   file_blob text NOT NULL,
+#   file_tag text NOT NULL,
+#   file_nonce text NOT NULL,
+#   aes_key text NOT NULL,
+#   hmac_key text NOT NULL
 # );""")
-
-# # # cur.execute("SELECT * FROM movie")
-# # # print(cur.fetchall())
 
 # con.commit()
 # con.close()
@@ -23,27 +86,6 @@ def convert_into_binary(file_path):
   with open(file_path, 'rb') as file:
     binary = file.read()
   return binary
-    
-def insert_into_database(file_path_name, file_blob, tag, nonce,aes_key, hmac_key): 
-  try:
-    conn = sqlite3.connect('tutorial.db')
-    print("[INFO] : Successful connection!")
-    cur = conn.cursor()
-    sql_insert_file_query = '''INSERT INTO uploads(file_name, file_blob, file_tag, file_nonce,aes_key, hmac_key)
-      VALUES(?, ?, ?, ?, ?, ?)'''
-    cur = conn.cursor()
-    cur.execute(sql_insert_file_query, (file_path_name, file_blob, tag, nonce,aes_key, hmac_key, ))
-    conn.commit()
-    print("[INFO] : The blob for ", file_path_name, " is in the database.") 
-    #last_updated_entry = cur.lastrowid
-    #return last_updated_entry
-  except Error as e:
-    print(e)  
-  finally:
-    if conn:
-      conn.close()
-    else:
-      error = "Oh shucks, something is wrong here."
 
 
 
