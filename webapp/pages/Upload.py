@@ -45,6 +45,7 @@ for uploaded_file in uploaded_files:
     last_updated_entry = db.insert_into_database(uploaded_file.name, ciphertext,tag,cipher.nonce, aes_key, hmac_key)
     conn.commit()
     conn.close()
+    st.write("Fichier upload :)")
 
 #Store user’s private data in a database
 #Refer to GDPR (EU)/UU PDP for what are considered to be private data
