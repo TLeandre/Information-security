@@ -1,6 +1,11 @@
 import sqlite3
 
 def main():
+    """
+    Main function for initialise the database structure
+    Table USERS contains all informations about Users
+    Table FILES contains all files informations 
+    """
     try:
         con = sqlite3.connect('database.db')
         cur = con.cursor()

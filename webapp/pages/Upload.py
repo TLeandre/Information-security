@@ -1,8 +1,7 @@
 import streamlit as st
-import pandas as pd
-import sqlite3
-from sqlite3 import Error
+
 import db as db
+import security
 
 from Crypto.Cipher import AES
 from Crypto.Hash import HMAC, SHA256
@@ -16,18 +15,20 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
     for uploaded_file in uploaded_files:
         bytes_data = uploaded_file.read()
         
-        aes_key = get_random_bytes(16)
-        hmac_key = get_random_bytes(16)
-
-        cipher = AES.new(aes_key, AES.MODE_CTR)
-        ciphertext = cipher.encrypt(bytes_data)
-
-        hmac = HMAC.new(hmac_key, digestmod=SHA256)
-        tag = hmac.update(cipher.nonce + ciphertext).digest()
+        ciphertext, tag, nonce, aes_key, hmac_key = security.AES_encrypt(bytes_data)
         
-        last_updated_entry = db.insert_into_database(st.session_state.id, uploaded_file.name, ciphertext,tag,cipher.nonce, aes_key, hmac_key)
+        last_updated_entry = db.insert_into_database(st.session_state.id, 
+                                                     uploaded_file.name, 
+                                                     ciphertext,
+                                                     tag,
+                                                     nonce, 
+                                                     aes_key, 
+                                                     hmac_key)
 
         st.success("File upload :)")
+
+else : 
+    st.markdown("### Unfortunately, you're not logged in. Please log in to access our services ")
 
 
 
