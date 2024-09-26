@@ -6,8 +6,9 @@ To launch the server do this commande line : streamlit run home.py
 
 
 TODO 
-- 3 autres cryptages
+- 2 autres cryptages
 - Fichier .docx
+- Lors de l'upload, si on reste sur la page et qu'on ajoute un fichier celui ajouter avant sera ajouté a nouveau
 - Gérer les unicité des noms des fichiers entre utilisateurs
 - Faire de la doc
 

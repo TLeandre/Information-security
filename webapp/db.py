@@ -38,13 +38,13 @@ def sign_in(name, surname, email, password):
     else :
         return -1 
     
-def insert_into_database(id, file_path_name, file_blob, tag, nonce,aes_key, hmac_key): 
+def insert_into_database(id, file_path_name, ciphertext, tag, init_value, algo_key, hmac_key): 
   try:
     con = sqlite3.connect('database.db')
     cur = con.cursor()
-    sql = '''INSERT INTO FILES(ID_USER, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_NONCE, AES_KEY, HMAC_KEY)
+    sql = '''INSERT INTO FILES(ID_USER, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_INIT_VALUE, ALGO_KEY, HMAC_KEY)
              VALUES(?, ?, ?, ?, ?, ?, ?)'''
-    cur.execute(sql, (id, file_path_name, file_blob, tag, nonce,aes_key, hmac_key))
+    cur.execute(sql, (id, file_path_name, ciphertext, tag, init_value, algo_key, hmac_key))
     con.commit()
   except Error as e:
     print(e)  
@@ -57,7 +57,7 @@ def insert_into_database(id, file_path_name, file_blob, tag, nonce,aes_key, hmac
 def get_files(id):
   con = sqlite3.connect('database.db')
   cur = con.cursor()
-  sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_NONCE, AES_KEY, HMAC_KEY 
+  sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_INIT_VALUE, ALGO_KEY, HMAC_KEY 
            FROM FILES
            WHERE ID_USER = ?"""
   cur.execute(sql, (id,))

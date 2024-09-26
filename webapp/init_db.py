@@ -26,8 +26,8 @@ def main():
                         FILE_NAME TEXT NOT NULL,
                         CIPHER_FILE TEXT NOT NULL,
                         FILE_TAG TEXT NOT NULL,
-                        FILE_NONCE TEXT NOT NULL,
-                        AES_KEY TEXT NOT NULL,
+                        FILE_INIT_VALUE TEXT NOT NULL,
+                        ALGO_KEY TEXT NOT NULL,
                         HMAC_KEY TEXT NOT NULL,
                         FOREIGN KEY(ID_USER) REFERENCES USERS(ID_USER)
                 )'''

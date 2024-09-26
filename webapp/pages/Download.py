@@ -42,14 +42,14 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
 
             ciphertext = df[2].get(index)
             tag = df[3].get(index)
-            nonce = df[4].get(index)
-            aes_key = df[5].get(index)
+            init_value = df[4].get(index)
+            algo_key = df[5].get(index)
             hmac_key = df[6].get(index)
             
-            plaintext = security.AES_decrypt(ciphertext,
+            plaintext = security.DES_decrypt(ciphertext,
                                              tag,
-                                             nonce,
-                                             aes_key,
+                                             init_value,
+                                             algo_key,
                                              hmac_key)
             
             if plaintext is None:
