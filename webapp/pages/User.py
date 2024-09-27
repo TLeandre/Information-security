@@ -1,6 +1,7 @@
 import streamlit as st
 import db as db
 import security
+import pandas as pd 
 
 if ('id' not in st.session_state) or (st.session_state.id == -1):
     with st.form("Login"):
@@ -33,5 +34,12 @@ if ('id' not in st.session_state) or (st.session_state.id == -1):
                 st.warning("Email already use")
 else:
     st.title("User")
+
+    files = db.get_user(st.session_state.id)
+
+    df = pd.DataFrame(files)
+
+    st.dataframe(df)
+
     if st.button("Logout"):
         st.session_state.id = -1   

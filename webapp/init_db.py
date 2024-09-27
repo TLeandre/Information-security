@@ -26,9 +26,10 @@ def main():
                         FILE_NAME TEXT NOT NULL,
                         CIPHER_FILE TEXT NOT NULL,
                         FILE_TAG TEXT NOT NULL,
-                        FILE_INIT_VALUE TEXT NOT NULL,
+                        FILE_INIT_VALUE TEXT,
                         ALGO_KEY TEXT NOT NULL,
                         HMAC_KEY TEXT NOT NULL,
+                        ALGO TEXT NOT NULL,
                         FOREIGN KEY(ID_USER) REFERENCES USERS(ID_USER)
                 )'''
         cur.execute(sql)

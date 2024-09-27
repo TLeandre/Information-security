@@ -6,11 +6,10 @@ To launch the server do this commande line : streamlit run home.py
 
 
 TODO 
-- 2 autres cryptages
+- Afficher les informations de l'utilisateur et les crypter / decrypté
 - Fichier .docx
-- Lors de l'upload, si on reste sur la page et qu'on ajoute un fichier celui ajouter avant sera ajouté a nouveau
 - Gérer les unicité des noms des fichiers entre utilisateurs
-- Faire de la doc
+- Faire de la doc 
 
 A demander au prof : 
 - necessité d'un vrai serveur ou serveur local suffit ? 
