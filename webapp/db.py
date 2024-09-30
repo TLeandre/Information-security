@@ -10,12 +10,15 @@ def connect(email: str, password: str) -> list:
   try:
     con = sqlite3.connect('database.db', check_same_thread=False)
     cursor = con.cursor()
-    cursor.execute("""SELECT PASSWORD, 
-                        ID_USER FROM USERS 
-                        WHERE EMAIL = '%s' """ % (str(email)) )
-    pw = cursor.fetchall()
-    if (security.verify_password(pw[0][0], password)):
-      return pw[0][1]
+    cursor.execute("""SELECT CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,PASSWORD,ID_USER  FROM USERS """ )
+    mails = cursor.fetchall()
+    for mail in mails:
+      if security.RC4_decrypt(mail[0][0],mail[0][1],mail[0][2],mail[0][3]).decode('utf-8') == email:
+        password_find = mail[0][4]
+        id_usr = mail[0][5]
+        
+    if (security.verify_password(password_find, password)):
+      return id_usr
     else:
       return -1
   except:
@@ -29,14 +32,22 @@ def connect(email: str, password: str) -> list:
 def sign_in(name: str, surname: str, email: str, password: str) -> list:
     con = sqlite3.connect('database.db', check_same_thread=False)
     cursor = con.cursor()
-    cursor.execute("""SELECT EMAIL FROM USERS WHERE EMAIL = '%s' """ % (str(email)))
-    mail = cursor.fetchall()
+    #cursor.execute("""SELECT CIPHER_EMAIL FROM USERS WHERE CIPHER_EMAIL = '%s' """ % (str(email)))
+    cursor.execute("""SELECT CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY  FROM USERS """ )
+    mails = cursor.fetchall()
+    mail_valid = 1
+    for mail in mails:
+      if security.RC4_decrypt(mail[0][0],mail[0][1],mail[0][2],mail[0][3]).decode('utf-8') == email:
+        mail_valid = 0
 
-    if len(mail) <= 0:
-
+    if mail_valid == 1:
+        CIPHER_NAME,NAME_TAG,NAME_INIT_VALUE,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO = security.RC4_encrypt(name.encode('utf-8'))
+        CIPHER_SURNAME,SURNAME_TAG,SURNAME_INIT_VALUE,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO = security.RC4_encrypt(surname.encode('utf-8'))
+        CIPHER_EMAIL,EMAIL_TAG,EMAIL_INIT_VALUE,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO = security.RC4_encrypt(email.encode('utf-8'))
+        print(CIPHER_EMAIL)
         pw = password
-        cursor.execute("""INSERT INTO USERS(NAME, SURNAME, EMAIL, PASSWORD) 
-                        VALUES ('%s','%s','%s','%s')""" % (name, surname, email, pw))
+        cursor.execute("""INSERT INTO USERS(CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO,CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO,CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO,PASSWORD) 
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""" , (CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO, CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO, CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO,pw))
         con.commit()
         return 0
     else :
@@ -45,13 +56,17 @@ def sign_in(name: str, surname: str, email: str, password: str) -> list:
 def get_user(id: int) -> id:
   con = sqlite3.connect('database.db')
   cur = con.cursor()
-  sql = """SELECT NAME, SURNAME, EMAIL
+  sql = """SELECT CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY, CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY, CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY
            FROM USERS
            WHERE ID_USER = ?"""
   cur.execute(sql, (id,))
   infos = cur.fetchall()
-
-  return infos
+  infos_decrypt = [
+    security.RC4_decrypt(infos[0][0],infos[0][1],infos[0][2],infos[0][3]).decode('utf-8'),
+    security.RC4_decrypt(infos[0][4],infos[0][5],infos[0][6],infos[0][7]).decode('utf-8'),
+    security.RC4_decrypt(infos[0][8],infos[0][9],infos[0][10],infos[0][11]).decode('utf-8'),
+  ]
+  return infos_decrypt
 
 ### --- 
 # Files section
