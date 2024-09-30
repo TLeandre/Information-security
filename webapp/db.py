@@ -13,15 +13,16 @@ def connect(email: str, password: str) -> list:
     cursor.execute("""SELECT CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,PASSWORD,ID_USER  FROM USERS """ )
     mails = cursor.fetchall()
     for mail in mails:
-      if security.RC4_decrypt(mail[0][0],mail[0][1],mail[0][2],mail[0][3]).decode('utf-8') == email:
-        password_find = mail[0][4]
-        id_usr = mail[0][5]
-        
+      if security.RC4_decrypt(mail[0],mail[1],mail[2],mail[3]).decode('utf-8') == email:
+        password_find = mail[4]
+        id_usr = mail[5]
+    con.close()    
     if (security.verify_password(password_find, password)):
       return id_usr
     else:
       return -1
-  except:
+  except Exception as e:
+    print(f"Erreur : {e}")
     return -1
   finally:
     if con:
@@ -37,20 +38,21 @@ def sign_in(name: str, surname: str, email: str, password: str) -> list:
     mails = cursor.fetchall()
     mail_valid = 1
     for mail in mails:
-      if security.RC4_decrypt(mail[0][0],mail[0][1],mail[0][2],mail[0][3]).decode('utf-8') == email:
+      if security.RC4_decrypt(mail[0],mail[1],mail[2],mail[3]).decode('utf-8') == email:
         mail_valid = 0
 
     if mail_valid == 1:
         CIPHER_NAME,NAME_TAG,NAME_INIT_VALUE,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO = security.RC4_encrypt(name.encode('utf-8'))
         CIPHER_SURNAME,SURNAME_TAG,SURNAME_INIT_VALUE,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO = security.RC4_encrypt(surname.encode('utf-8'))
         CIPHER_EMAIL,EMAIL_TAG,EMAIL_INIT_VALUE,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO = security.RC4_encrypt(email.encode('utf-8'))
-        print(CIPHER_EMAIL)
         pw = password
         cursor.execute("""INSERT INTO USERS(CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO,CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO,CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO,PASSWORD) 
                         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""" , (CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY,NAME_ALGO, CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY,SURNAME_ALGO, CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY,EMAIL_ALGO,pw))
         con.commit()
+        con.close()
         return 0
     else :
+        con.close()
         return -1 
     
 def get_user(id: int) -> id:
