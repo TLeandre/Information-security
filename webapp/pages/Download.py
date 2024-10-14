@@ -5,6 +5,7 @@ import os
 
 from streamlit_pdf_viewer import pdf_viewer
 import io
+from docx import Document
 
 
 from Crypto.Cipher import AES
@@ -91,6 +92,13 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                         file.write(plaintext)
                     data_text = io.StringIO(plaintext.decode('utf-8')) 
                     st.dataframe(pd.read_csv((data_text), delimiter=';'))
+                elif extension == ".docx":
+                    docx_buffer = io.BytesIO(plaintext)
+                    # Lire le document docx depuis le buffer
+                    document = Document(docx_buffer)
+                    # Afficher le contenu du document
+                    for para in document.paragraphs:
+                        st.write(para.text)
                 else :
                     st.write("Exention de fichier non traités")
 else : 

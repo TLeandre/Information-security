@@ -12,9 +12,25 @@ def main():
 
         sql = '''CREATE TABLE IF NOT EXISTS USERS (
                         ID_USER INTEGER PRIMARY KEY AUTOINCREMENT,
-                        NAME VARCHAR(10) NOT NULL,
-                        SURNAME VARCHAR(10) NOT NULL,
-                        EMAIL VARCHAR(10) NOT NULL,
+                        
+                        CIPHER_NAME TEXT NOT NULL,
+                        NAME_TAG TEXT NOT NULL,
+                        NAME_ALGO_KEY TEXT NOT NULL,
+                        NAME_HMAC_KEY TEXT NOT NULL,
+                        NAME_ALGO TEXT NOT NULL,
+                        
+                        CIPHER_SURNAME TEXT NOT NULL,
+                        SURNAME_TAG TEXT NOT NULL,
+                        SURNAME_ALGO_KEY TEXT NOT NULL,
+                        SURNAME_HMAC_KEY TEXT NOT NULL,
+                        SURNAME_ALGO TEXT NOT NULL,
+                        
+                        CIPHER_EMAIL TEXT NOT NULL,
+                        EMAIL_TAG TEXT NOT NULL,
+                        EMAIL_ALGO_KEY TEXT NOT NULL,
+                        EMAIL_HMAC_KEY TEXT NOT NULL,
+                        EMAIL_ALGO TEXT NOT NULL,
+
                         PASSWORD VARCHAR(10) NOT NULL
                 )'''
         cur.execute(sql)
