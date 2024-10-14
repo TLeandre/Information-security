@@ -24,5 +24,6 @@ On this page, you can upload your files. Every file uploaded is encrypted before
             
 ### ⬇️ Download
             
-Access your previously uploaded files from this page. You can download them securely with decryption.
+Access your previously uploaded files from this page.  
+You can download them securely with decryption.
 """)

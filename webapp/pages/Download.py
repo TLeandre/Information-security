@@ -19,15 +19,16 @@ st.set_page_config(layout='wide')
 if ('id' in st.session_state) and (st.session_state.id != -1):
     with st.container():
         col1, col2 = st.columns([1,4], gap="large", vertical_alignment = "top")
-
+        
+        #retrieve the document from the database 
         files = db.get_files(st.session_state.id)
-
         df = pd.DataFrame(files)
 
-        #verification du nombre de document
+        #checking the number of documents
         if df.shape[0] <= 0:
             st.write("No documents have been uploaded yet, go to the upload page to secure your data ")
         else : 
+            ## display all documents 
             with col1:
                 st.dataframe(df[1], 
                              column_config={"1": "Nom du fichier"},
@@ -35,7 +36,7 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                              hide_index=1)
             
             with col2:
-                selected_item = st.selectbox("Choisissez un fichier :", df[1])
+                selected_item = st.selectbox("Select a document :", df[1])
 
                 # Récupérer l'index de l'élément sélectionné
                 index = df[df[1] == selected_item].index[0]
@@ -49,6 +50,7 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                 hmac_key = df[6].get(index)
                 algo = df[7].get(index)
 
+                ## decryption 
                 if algo == "AES":
                     plaintext = security.AES_decrypt(ciphertext,
                                                     tag,
@@ -74,6 +76,8 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                     st.success(f"The file has been successfully decrypted using : {algo}")
 
                 st.download_button("Download the file", plaintext, selected_item, use_container_width = 1)
+
+                ## display selected document 
                 if extension == ".mp4":
                     st.video(plaintext)
                 elif extension == ".mp3":
@@ -100,6 +104,10 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                     for para in document.paragraphs:
                         st.write(para.text)
                 else :
-                    st.write("Exention de fichier non traités")
+                    st.markdown("""File extension not supported :  
+                                - Preview not available  
+                                - Downloaded file does not match the original  
+                                - Decryption doesn't work properly
+                                """)
 else : 
     st.markdown("### Unfortunately, you're not logged in. Please log in to access our services ")

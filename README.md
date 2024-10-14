@@ -1,21 +1,21 @@
 # Information-security
 Information Security Project
 
-To launch the server do this commande line : streamlit run home.py
+---
 
+### Prerequisites : 
 
+Install the requirements : 
+> pip install -r requirements.txt
 
-TODO 
-- Afficher les informations de l'utilisateur et les crypter / decrypté
-- Fichier .docx
-- Gérer les unicité des noms des fichiers entre utilisateurs
-- Faire de la doc 
+If you don't have the database.db file, go to the webapp file and run the command: 
+> python init_db.py 
 
-A demander au prof : 
-- necessité d'un vrai serveur ou serveur local suffit ? 
-    Non peut faire tout en local 
-- Faire les 4 cryptages pour chaque fichier, laisser le choix à l'utilisateur 
-    On doit enregistrer les fichiers avec les 4 methodes de cryptage différente
+The database.db file must be included in the webapp file.
 
-A faire attention pour la suite : 
-- necessité de mettre la base de données à jour, si necessite de stocker des clés différents etc ... 
+---
+
+### Launch the website: 
+
+In the webapp file, run the command : 
+> streamlit run home.py

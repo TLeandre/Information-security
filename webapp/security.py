@@ -1,4 +1,4 @@
-from Crypto.Cipher import AES, DES
+from Crypto.Cipher import AES, DES, ARC4
 from Crypto.Hash import HMAC, SHA256
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
@@ -143,10 +143,6 @@ def DES_decrypt(ciphertext: bytes, tag: bytes, iv: bytes, des_key: bytes, hmac_k
     print("Time to decrypt DES : ", (time.time() - start_time))
 
     return plaintext
-
-from Crypto.Cipher import ARC4
-from Crypto.Hash import HMAC, SHA256
-from Crypto.Random import get_random_bytes
 
 def RC4_encrypt(bytes_data: bytes) -> tuple:
     """
