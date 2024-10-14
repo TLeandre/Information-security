@@ -6,7 +6,17 @@ import security
 # User section
 ### --- 
 
-def connect(email: str, password: str) -> list:
+def connect(email: str, password: str) -> int:
+  """
+  Connection verification
+
+  Args:
+      email (str): email of the user
+      password (str): password of the user
+
+  Returns:
+      int: information about user id or -1 if the connexion failed
+  """
   try:
     con = sqlite3.connect('database.db', check_same_thread=False)
     cursor = con.cursor()
@@ -30,7 +40,19 @@ def connect(email: str, password: str) -> list:
     else:
       error = "Oh shucks, something is wrong here."
     
-def sign_in(name: str, surname: str, email: str, password: str) -> list:
+def sign_in(name: str, surname: str, email: str, password: str) -> int:
+    """
+    Sign up user inside database
+
+    Args:
+        name (str): name of the user
+        surname (str): surname of the user
+        email (str): email of the user
+        password (str): password of the user
+
+    Returns:
+        int: if the sign up failed or not
+    """
     con = sqlite3.connect('database.db', check_same_thread=False)
     cursor = con.cursor()
     #cursor.execute("""SELECT CIPHER_EMAIL FROM USERS WHERE CIPHER_EMAIL = '%s' """ % (str(email)))
@@ -55,7 +77,16 @@ def sign_in(name: str, surname: str, email: str, password: str) -> list:
         con.close()
         return -1 
     
-def get_user(id: int) -> id:
+def get_user(id: int) -> list:
+  """
+  User informations 
+
+  Args:
+      id (int): id of the user
+
+  Returns:
+      list: all information about the logged-in user 
+  """
   con = sqlite3.connect('database.db')
   cur = con.cursor()
   sql = """SELECT CIPHER_NAME,NAME_TAG,NAME_ALGO_KEY,NAME_HMAC_KEY, CIPHER_SURNAME,SURNAME_TAG,SURNAME_ALGO_KEY,SURNAME_HMAC_KEY, CIPHER_EMAIL,EMAIL_TAG,EMAIL_ALGO_KEY,EMAIL_HMAC_KEY
@@ -75,6 +106,20 @@ def get_user(id: int) -> id:
 ### --- 
     
 def insert_into_database(id: int, file_path_name: str, ciphertext: bytes, tag: bytes, init_value: bytes, algo_key: bytes, hmac_key: bytes, algo: bytes) -> None: 
+  """
+  Insert data into database
+
+  Args:
+      id (int): id of the user
+      file_path_name (str): file name
+      ciphertext (bytes): ciphertext used
+      tag (bytes): tag used
+      init_value (bytes): init_value used
+      algo_key (bytes): algo_key used
+      hmac_key (bytes): hmac_key used
+      algo (bytes): algo used
+
+  """
   try:
     con = sqlite3.connect('database.db')
     cur = con.cursor()
@@ -91,6 +136,15 @@ def insert_into_database(id: int, file_path_name: str, ciphertext: bytes, tag: b
       error = "Oh shucks, something is wrong here."
 
 def get_files(id: int) -> list:
+  """
+  Retrieve all documents associated with a user 
+
+  Args:
+      id (int): id of the user
+
+  Returns:
+      list: all documents and information associated
+  """
   con = sqlite3.connect('database.db')
   cur = con.cursor()
   sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_INIT_VALUE, ALGO_KEY, HMAC_KEY, ALGO

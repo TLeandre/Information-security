@@ -30,7 +30,7 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                                                         hmac_key,
                                                         algo)
 
-        st.success("File upload :)")
+        st.success("File uploaded")
 
 else : 
     st.markdown("### Unfortunately, you're not logged in. Please log in to access our services ")
