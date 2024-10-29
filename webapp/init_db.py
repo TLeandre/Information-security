@@ -31,7 +31,11 @@ def main():
                         EMAIL_HMAC_KEY TEXT NOT NULL,
                         EMAIL_ALGO TEXT NOT NULL,
 
-                        PASSWORD VARCHAR(10) NOT NULL
+                        PASSWORD VARCHAR(10) NOT NULL,
+
+                        PUBLIC_KEY TEXT,
+                        PRIVATE_KEY TEXT,
+                        SHARED_KEY TEXT
                 )'''
         cur.execute(sql)
         con.commit()
@@ -47,6 +51,35 @@ def main():
                         HMAC_KEY TEXT NOT NULL,
                         ALGO TEXT NOT NULL,
                         FOREIGN KEY(ID_USER) REFERENCES USERS(ID_USER)
+                )'''
+        cur.execute(sql)
+        con.commit()
+
+        sql = '''CREATE TABLE IF NOT EXISTS CONNECTIONS (
+                        ID_CONNECTION INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ID_REQUESTER INTEGER NOT NULL,
+                        ID_RECEIVER INTEGER NOT NULL,
+                        IS_CONFIRMED INTEGER DEFAULT 0, -- 0: Non confirmé, 1: Confirmé
+                        FOREIGN KEY(ID_REQUESTER) REFERENCES USERS(ID_USER),
+                        FOREIGN KEY(ID_RECEIVER) REFERENCES USERS(ID_USER)
+                )'''
+        
+        cur.execute(sql)
+        con.commit()
+
+        sql = '''CREATE TABLE IF NOT EXISTS SHARED_FILES (
+                        ID_FILES INTEGER PRIMARY KEY AUTOINCREMENT,
+                        ID_REQUESTER INTEGER NOT NULL,
+                        ID_RECEIVER INTEGER NOT NULL,
+                        FILE_NAME TEXT NOT NULL,
+                        CIPHER_FILE TEXT NOT NULL,
+                        FILE_TAG TEXT NOT NULL,
+                        FILE_INIT_VALUE TEXT,
+                        ALGO_KEY TEXT NOT NULL,
+                        HMAC_KEY TEXT NOT NULL,
+                        ALGO TEXT NOT NULL,
+                        FOREIGN KEY(ID_REQUESTER) REFERENCES USERS(ID_USER),
+                        FOREIGN KEY(ID_RECEIVER) REFERENCES USERS(ID_USER)
                 )'''
         cur.execute(sql)
         con.commit()

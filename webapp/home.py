@@ -26,4 +26,12 @@ On this page, you can upload your files. Every file uploaded is encrypted before
             
 Access your previously uploaded files from this page.  
 You can download them securely with decryption.
+            
+### 👨‍👦 Friends
+            
+On this page you can ask other users to share their documents with you. 
+            
+### 📂 Shared Files
+            
+When someone agrees to share their documents with you, you can find them all on this page. 
 """)
