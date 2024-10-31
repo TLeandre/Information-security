@@ -105,7 +105,6 @@ def DES_encrypt(bytes_data: bytes) -> tuple:
 
     return ciphertext, tag, iv, des_key, hmac_key, "DES"
 
-
 def DES_decrypt(ciphertext: bytes, tag: bytes, iv: bytes, des_key: bytes, hmac_key: bytes) -> bytes:
     """
     DES decryption in CBC mode.
@@ -192,7 +191,7 @@ def generate_rsa_keys():
         tuple: (public_key, private_key) as strings.
     """
     key = RSA.generate(1024)
-    private_key = key.export_key().decode('utf-8')  
+    private_key = key.export_key().decode('utf-8') 
     public_key = key.publickey().export_key().decode('utf-8') 
     return public_key, private_key
 
@@ -298,3 +297,24 @@ def decrypt_shared_key(encrypted_shared_key_hex: bytes, private_key: bytes) -> b
     except ValueError as e:
         print(f"Error during decryption: {e}")
         return None
+
+def hash_signature(plaintext: bytes) -> bytes:
+    hash_obj = SHA256.new()
+    hash_obj.update(plaintext)
+    return hash_obj
+
+def digital_signature_encrypt(ciphertext: bytes, private_key: bytes) -> bytes:
+
+    hash_plaintext_hex = hash_signature(ciphertext).hexdigest()
+    
+    hash_plaintext = bytes.fromhex(hash_plaintext_hex)
+
+    encrypted_digital_signature = encrypt_shared_key(shared_key=hash_plaintext,public_key=private_key)
+    
+    return encrypted_digital_signature
+
+def digital_signature_decrypt(cipher_digital_signature: bytes, public_key: bytes) -> bytes:
+
+    decrypted_digital_signature = decrypt_shared_key(encrypted_shared_key_hex=cipher_digital_signature,private_key=public_key)
+    
+    return decrypted_digital_signature  

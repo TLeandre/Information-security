@@ -184,7 +184,7 @@ def get_files(id: int) -> list:
   """
   con = sqlite3.connect('database.db')
   cur = con.cursor()
-  sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_INIT_VALUE, ALGO_KEY, HMAC_KEY, ALGO
+  sql = """SELECT ID_FILES, FILE_NAME, CIPHER_FILE, FILE_TAG, FILE_INIT_VALUE, ALGO_KEY, HMAC_KEY, ALGO,SIGNATURE
            FROM FILES
            WHERE ID_USER = ?"""
   cur.execute(sql, (id,))
@@ -192,6 +192,28 @@ def get_files(id: int) -> list:
 
   return files
 
+def insert_digital_signature(id_file: int, digital_signature: bytes) -> None:
+    """
+    Insert data into database
+
+    Args:
+        id_file (int): id of the file
+        digital_signature (bytes): digital signature of the file encrypted with the private key of the owner
+
+    """
+    try:
+        con = sqlite3.connect('database.db')
+        cur = con.cursor()
+        sql = '''UPDATE FILES SET SIGNATURE = ? WHERE ID_FILES = ?'''
+        cur.execute(sql, (digital_signature,str(id_file)))
+        con.commit()
+    except Error as e:
+        print(e)  
+    finally: 
+        if con:
+            con.close()
+        else:
+            error = "Oh shucks, something is wrong here."
 
 ### --- 
 # Connection
@@ -555,5 +577,32 @@ def delete_shared_documents(id_receiver: int, id_requester: int) -> None:
     except sqlite3.Error as error:
         print("[INFO] : Échec de la suppression des documents partagés : ", error)
     
+    finally:
+        con.close()
+
+def get_public_key(user_id: int) -> bytes:
+    """
+    Retrieve the private key of the specified user from the database.
+
+    Args:
+        user_id (int): The ID of the user whose private key is to be retrieved.
+
+    Returns:
+        bytes: The private key of the user, or None if not found.
+    """
+    try:
+        con = sqlite3.connect('database.db')
+        cursor = con.cursor()
+
+        # Requête pour récupérer la clé privée de l'utilisateur
+        cursor.execute("SELECT PUBLIC_KEY FROM USERS WHERE ID_USER = ?", (user_id,))
+        result = cursor.fetchone()
+        private_key_hex = result[0]
+
+        return private_key_hex
+
+    except sqlite3.Error as error:
+        print("[INFO] : Failed to retrieve private key: ", error)
+        return None
     finally:
         con.close()

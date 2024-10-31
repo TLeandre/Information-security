@@ -50,6 +50,7 @@ def main():
                         ALGO_KEY TEXT NOT NULL,
                         HMAC_KEY TEXT NOT NULL,
                         ALGO TEXT NOT NULL,
+                        SIGNATURE TEXT,
                         FOREIGN KEY(ID_USER) REFERENCES USERS(ID_USER)
                 )'''
         cur.execute(sql)

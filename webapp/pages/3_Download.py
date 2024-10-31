@@ -49,6 +49,7 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                 algo_key = df[5].get(index)
                 hmac_key = df[6].get(index)
                 algo = df[7].get(index)
+                digital_signature = df[8].get(index)
 
                 ## decryption 
                 if algo == "AES":
@@ -87,6 +88,24 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                 elif extension == ".webp":
                     st.image(plaintext)    
                 elif extension == ".pdf":
+                    st.title("Document Signature")
+                    
+                    private_key = db.get_private_key(st.session_state.id)
+                    public_key = db.get_public_key(st.session_state.id)
+                    
+                    if st.button("Document Signature",use_container_width=1):
+                        digital_signature_encrypt = security.digital_signature_encrypt(ciphertext=plaintext,private_key=private_key)
+                        db.insert_digital_signature(id_file= df[0].get(index),digital_signature=digital_signature_encrypt)
+                    
+                    if st.button("Document Verifying",use_container_width=1):
+                        a = 0
+                        digital_signature_decrypt = security.digital_signature_decrypt(cipher_digital_signature=digital_signature,public_key=public_key)
+                        
+                        if(digital_signature_decrypt == bytes.fromhex(security.hash_signature(plaintext))):
+                            st.write("The document is verrified")
+                        else:
+                            st.write("The document is not verrified")
+                    
                     pdf_viewer(input=plaintext,
                                 width=700)
                 elif extension == ".XLS":
