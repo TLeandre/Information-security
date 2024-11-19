@@ -98,12 +98,10 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                         db.insert_digital_signature(id_file= df[0].get(index),digital_signature=digital_signature_encrypt)
                     
                     if st.button("Document Verifying",use_container_width=1):
-                        a = 0
-                        digital_signature_decrypt = security.digital_signature_decrypt(cipher_digital_signature=digital_signature,public_key=public_key)
-                        
-                        if(digital_signature_decrypt == bytes.fromhex(security.hash_signature(plaintext))):
+                        try: 
+                            digital_signature_verify = security.digital_signature_verify(hash_file=plaintext,cipher_digital_signature=digital_signature,public_key=public_key)
                             st.write("The document is verrified")
-                        else:
+                        except (ValueError, TypeError):
                             st.write("The document is not verrified")
                     
                     pdf_viewer(input=plaintext,

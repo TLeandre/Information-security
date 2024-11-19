@@ -3,6 +3,7 @@ from Crypto.Hash import HMAC, SHA256
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad, unpad
 from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
 import time
 
 def hash_password(password: str) -> str:
@@ -303,18 +304,78 @@ def hash_signature(plaintext: bytes) -> bytes:
     hash_obj.update(plaintext)
     return hash_obj
 
-def digital_signature_encrypt(ciphertext: bytes, private_key: bytes) -> bytes:
+def encrypt_signature(file: bytes, private_key: bytes) -> bytes:
+    """
+    Encrypt the file hash using the private key.
 
-    hash_plaintext_hex = hash_signature(ciphertext).hexdigest()
+    Args:
+        file (bytes): The hash file to encrypt.
+        private_key (bytes): The private key to use for encryption.
+
+    Returns:
+        bytes: The encrypted file.
+    """
+    try:
+        # Convertir la clé publique de chaîne en clé RSA
+        rsa_private_key = RSA.import_key(private_key)
+        cipher_rsa = pkcs1_15.new(rsa_private_key)
+
+        # Chiffrer la shared_key
+        encrypted_file = cipher_rsa.sign(file)
+        
+        return encrypted_file.hex()
+
+    except ValueError as e:
+        print(f"Error during encryption: {e}")
+        return None
+
+def decrypt_signature(hash_file: bytes, encrypted_file_hex: bytes, public_key: bytes) -> bytes:
+    """
+    Decrypt the hash file using the public key.
+
+    Args:
+        encrypted_file_hex (bytes): The encrypted file to decrypt.
+        private_key (bytes): The public key to use for decryption.
+
+    Returns:
+        bytes: The decrypted shared key.
+    """
+    try:
+        if not all(c in '0123456789abcdefABCDEF' for c in encrypted_file_hex):
+            raise ValueError("Invalid hexadecimal format for the encrypted key.")
+        
+        # Convertir la clé privée de chaîne en clé RSA
+        rsa_public_key = RSA.import_key(public_key)
+        cipher_rsa = pkcs1_15.new(rsa_public_key)
+
+        encrypted_file = bytes.fromhex(encrypted_file_hex)
+
+        if len(encrypted_file) != (rsa_public_key.size_in_bytes()):
+            raise ValueError("Ciphertext with incorrect length.")
+
+        decrypted_shared_key = cipher_rsa.verify(hash_file,encrypted_file)
+        return decrypted_shared_key
+
+    except ValueError as e:
+        print(f"Error during decryption: {e}")
+        return None
+
+
+def digital_signature_encrypt(ciphertext: bytes, private_key: bytes) -> bytes:
+    
+    hash_plaintext_SHA256 = hash_signature(ciphertext)
+
+    hash_plaintext_hex = hash_plaintext_SHA256.hexdigest()
     
     hash_plaintext = bytes.fromhex(hash_plaintext_hex)
 
-    encrypted_digital_signature = encrypt_shared_key(shared_key=hash_plaintext,public_key=private_key)
+    encrypted_digital_signature = encrypt_signature(file=hash_plaintext_SHA256,private_key=private_key)
     
     return encrypted_digital_signature
 
-def digital_signature_decrypt(cipher_digital_signature: bytes, public_key: bytes) -> bytes:
+def digital_signature_verify(hash_file: bytes,cipher_digital_signature: bytes, public_key: bytes) -> bytes:
 
-    decrypted_digital_signature = decrypt_shared_key(encrypted_shared_key_hex=cipher_digital_signature,private_key=public_key)
+    hash_file = hash_signature(hash_file)
+    decrypted_digital_signature = decrypt_signature(hash_file=hash_file,encrypted_file_hex=cipher_digital_signature,public_key=public_key)
     
-    return decrypted_digital_signature  
+    return decrypted_digital_signature
