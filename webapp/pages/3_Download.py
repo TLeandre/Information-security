@@ -100,10 +100,9 @@ if ('id' in st.session_state) and (st.session_state.id != -1):
                     if st.button("Document Verifying",use_container_width=1):
                         try: 
                             digital_signature_verify = security.digital_signature_verify(hash_file=plaintext,cipher_digital_signature=digital_signature,public_key=public_key)
-                            st.write("The document is verrified")
+                            st.success("The document is verrified")
                         except (ValueError, TypeError):
-                            st.write("The document is not verrified")
-                    
+                            st.warning("The document is not verrified")
                     pdf_viewer(input=plaintext,
                                 width=700)
                 elif extension == ".XLS":
